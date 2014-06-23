@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby
+@loader = Thread.new { require ENV['TM_SUPPORT_PATH'] + '/lib/ui.rb' }
+
+require 'json'
+require 'shellwords'
+
+url = 'http://localhost:47367'
+json = {
+  :command =&gt; "code_completion",
+  :project =&gt; ENV['TM_PROJECT_DIRECTORY'],
+  :file =&gt; ENV['TM_FILEPATH'],
+  :code =&gt; STDIN.read,
+  :location =&gt; {
+    :row    =&gt; ENV['TM_LINE_NUMBER'].to_i,
+    :column =&gt; ENV['TM_COLUMN_NUMBER'].to_i,
+  }
+}.to_json
+file = '/tmp/rsense.json'
+File.open(file, 'w') {|f| f &lt;&lt; json}
+
+command = [
+  'curl', 
+  '-X', 'POST', 
+  '-H', 'Accept: application/json',
+  '-H', 'Content-Type: application/json',
+  '--data', "@#{file}",
+  url
+].flatten.map(&amp;:shellescape).join(' ')
+
+# puts
+# puts 'rsense.json:'
+# puts json
+puts
+puts command
+# puts
+# puts
+raw = `#{command}`
+unless $?.success?
+  $stderr.puts "A problem occurred, have you started rsense already? (rsense start)"
+  exit 1
+end
+# p raw
+# exit
+completions = JSON.parse(raw)
+
+@loader.join
+choices = completions['completions']
+choices.flatten!.uniq!
+if choices.size == 0
+  exit 0
+elsif choices.size == 1
+  print choices.first[current_word.size..-1]
+else
+  TextMate::UI.complete(choices, :initial_filter =&gt; current_word)
+end
+
+
+</string>
+	<key>input</key>
+	<string>document</string>
+	<key>inputFormat</key>
+	<string>text</string>
+	<key>keyEquivalent</key>
+	<string>^</string>
+	<key>name</key>
+	<string>Complete</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>text</string>
+	<key>outputLocation</key>
+	<string>newWindow</string>
+	<key>scope</key>
+	<string>source.ruby</string>
+	<key>uuid</key>
+	<string>9C0C0883-1B52-4464-AA76-4634C1044E11</string>
+	<key>version</key>
+	<integer>2</integer>
+</dict>
+</plist>

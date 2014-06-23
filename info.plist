@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>contactEmailRot13</key>
+	<string>ryvn@fpuvgb.zr</string>
+	<key>contactName</key>
+	<string>Elia Schito</string>
+	<key>description</key>
+	<string>New shiny bundle for RSense.</string>
+	<key>name</key>
+	<string>RSense</string>
+	<key>uuid</key>
+	<string>FFD13650-24ED-4494-BA65-51009AE063AC</string>
+</dict>
+</plist>
