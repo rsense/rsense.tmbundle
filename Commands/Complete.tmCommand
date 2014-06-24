@@ -13,7 +13,7 @@ require 'shellwords'
 
 url = 'http://localhost:47367'
 json = {
-  :command =&gt; "code_completion",
+  :command =&gt; 'code_completion',
   :project =&gt; ENV['TM_PROJECT_DIRECTORY'],
   :file =&gt; ENV['TM_FILEPATH'],
   :code =&gt; STDIN.read,
@@ -26,7 +26,7 @@ file = '/tmp/rsense.json'
 File.open(file, 'w') {|f| f &lt;&lt; json}
 
 command = [
-  'curl', 
+  'curl', '--silent', 
   '-X', 'POST', 
   '-H', 'Accept: application/json',
   '-H', 'Content-Type: application/json',
@@ -37,8 +37,8 @@ command = [
 # puts
 # puts 'rsense.json:'
 # puts json
-puts
-puts command
+# puts
+# puts command
 # puts
 # puts
 raw = `#{command}`
@@ -51,32 +51,31 @@ end
 completions = JSON.parse(raw)
 
 @loader.join
-choices = completions['completions']
-choices.flatten!.uniq!
+choices = completions['completions'] || raise(completions.inspect)
+choices = choices.map{|c| c['name']}.flatten.uniq
+
+
 if choices.size == 0
+  TextMate::UI.tool_tip 'Nothing found'
   exit 0
-elsif choices.size == 1
-  print choices.first[current_word.size..-1]
 else
-  TextMate::UI.complete(choices, :initial_filter =&gt; current_word)
+  print  %{.${1|#{choices.sort.join(',')}|}} #, :initial_filter =&gt; current_word)
 end
-
-
 </string>
 	<key>input</key>
 	<string>document</string>
 	<key>inputFormat</key>
 	<string>text</string>
 	<key>keyEquivalent</key>
-	<string>^</string>
+	<string>.</string>
 	<key>name</key>
 	<string>Complete</string>
 	<key>outputCaret</key>
-	<string>afterOutput</string>
+	<string>heuristic</string>
 	<key>outputFormat</key>
-	<string>text</string>
+	<string>snippet</string>
 	<key>outputLocation</key>
-	<string>newWindow</string>
+	<string>atCaret</string>
 	<key>scope</key>
 	<string>source.ruby</string>
 	<key>uuid</key>
