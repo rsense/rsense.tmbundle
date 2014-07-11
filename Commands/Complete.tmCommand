@@ -77,7 +77,7 @@ end
 	<key>outputLocation</key>
 	<string>atCaret</string>
 	<key>scope</key>
-	<string>source.ruby</string>
+	<string>source.ruby - string</string>
 	<key>uuid</key>
 	<string>9C0C0883-1B52-4464-AA76-4634C1044E11</string>
 	<key>version</key>
